@@ -16,3 +16,11 @@ A JSON based web UI for desktop applications built in Python.
 
 ### Option 2: Web Sockets
 TBD
+
+# Demo
+Run the backend service:
+```
+cd backend
+uv run fastapi dev main.py
+```
+Then open frontend/index.html in browser & you can interact with it.

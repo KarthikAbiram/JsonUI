@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>JSON UI Frontend</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 400px;
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+    }
+
+    input {
+      width: 100%;
+      padding: 6px;
+      margin-top: 4px;
+    }
+
+    .readonly {
+      background: #f0f0f0;
+    }
+
+    button {
+      margin-top: 16px;
+      padding: 8px;
+      width: 100%;
+    }
+
+    pre {
+      margin-top: 20px;
+      background: #f7f7f7;
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>FastAPI JSON UI</h2>
+
+<label>
+  Number 1
+  <input id="number1" type="number" step="any" />
+</label>
+
+<label>
+  Number 2
+  <input id="number2" type="number" step="any" />
+</label>
+
+<label>
+  Result
+  <input id="result" type="number" readonly class="readonly" />
+</label>
+
+<button onclick="refresh()">Refresh</button>
+
+<pre id="raw"></pre>
+
+<script>
+const API_URL = "http://localhost:8000/";
+
+async function getUI() {
+  const res = await fetch(API_URL);
+  return await res.json();
+}
+
+async function updateVariable(path, value) {
+  const url = new URL(API_URL);
+  url.searchParams.set("variable_path", path);
+  url.searchParams.set("value", value);
+
+  await fetch(url, { method: "PUT" });
+}
+
+async function refresh() {
+  const data = await getUI();
+
+  document.getElementById("number1").value = data.number1;
+  document.getElementById("number2").value = data.number2;
+  document.getElementById("result").value = data.result;
+
+  document.getElementById("raw").textContent =
+    JSON.stringify(data, null, 2);
+}
+
+function attachHandlers() {
+  ["number1", "number2"].forEach(id => {
+    document.getElementById(id).addEventListener("change", async (e) => {
+      await updateVariable(id, e.target.value);
+      await refresh();
+    });
+  });
+}
+
+// init
+attachHandlers();
+refresh();
+</script>
+
+</body>
+</html>
